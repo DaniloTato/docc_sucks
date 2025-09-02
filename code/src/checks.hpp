@@ -17,4 +17,6 @@ range longest_palindrome_substr(string seq);
 
 range longest_common_substr(string seq_a, string seq_b);
 
+std::vector<range> find(std::string& txt, std::string& pattern);
+
 #endif // !CHECKS_HPP

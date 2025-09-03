@@ -1,22 +1,28 @@
 #ifndef CHECKS_HPP
 #define CHECKS_HPP
 
-#include <cstddef>
+#include <optional>
 #include <string>
+#include <vector>
 
 using std::string;
+using std::vector;
+
 typedef std::pair<size_t, size_t> range;
+range make_range(size_t l, size_t r);
+
+typedef std::optional<std::string> optstring;
+
+constexpr size_t ASCII_SIZE = 1 << sizeof(char);
 
 // May be inneficient if this search can be optimized in the case in which
 // checking for many mcodes at the same time is more efficient than looking one
 // by one, this is not the case if the complexity cannot be made less than
 // O(m).
-size_t substr(string seq, string sub);
+int is_substr(const string &seq, const string &sub);
 
-range longest_palindrome_substr(string seq);
+range longest_palindrome_substr(const string &seq);
 
-range longest_common_substr(string seq_a, string seq_b);
-
-std::vector<range> find(std::string& txt, std::string& pattern);
+range longest_common_substr(const string &seq_a, const string &seq_b);
 
 #endif // !CHECKS_HPP

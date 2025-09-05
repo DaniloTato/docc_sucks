@@ -1,30 +1,28 @@
 #include "checks.hpp"
 #include <array>
-#include <vector>
 
 struct SAMState {
     int link = -1;
     int len = 0;
     int first_pos = -1;
-    std::array<int, 256> next;
+    std::array<int, ASCII_SIZE> next;
     SAMState() { next.fill(-1); }
 };
 
 // Substring Automaton
 range longest_common_substr(const string &seq_a, const string &seq_b) {
-    const int n = static_cast<int>(seq_a.size());
-    const int m = static_cast<int>(seq_b.size());
+    int n = seq_a.size(), m = seq_b.size();
     if (n == 0 || m == 0)
         return make_range(0, 0);
 
-    std::vector<SAMState> st;
+    vector<SAMState> st;
     st.reserve(2 * n);
     st.emplace_back();
     int last = 0;
 
     for (int i = 0; i < n; ++i) {
-        unsigned char c = static_cast<unsigned char>(seq_a[i]);
-        int cur = static_cast<int>(st.size());
+        unsigned char c = seq_a[i];
+        int cur = st.size();
         st.emplace_back();
         st[cur].len = st[last].len + 1;
         st[cur].first_pos = i;
@@ -41,7 +39,7 @@ range longest_common_substr(const string &seq_a, const string &seq_b) {
             if (st[p].len + 1 == st[q].len) {
                 st[cur].link = q;
             } else {
-                int clone = static_cast<int>(st.size());
+                int clone = st.size();
                 st.push_back(st[q]);
                 st[clone].len = st[p].len + 1;
                 // keep first_pos of q
@@ -57,7 +55,7 @@ range longest_common_substr(const string &seq_a, const string &seq_b) {
 
     int v = 0, L = 0, best_len = 0, best_state = 0;
     for (int i = 0; i < m; ++i) {
-        unsigned char c = static_cast<unsigned char>(seq_b[i]);
+        unsigned char c = seq_b[i];
         while (v && st[v].next[c] == -1) {
             v = st[v].link;
             L = st[v].len;

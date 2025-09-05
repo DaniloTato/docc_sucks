@@ -1,6 +1,9 @@
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <sstream>
+
+using std::filesystem::path;
 
 #include "checks.hpp"
 
@@ -8,9 +11,9 @@ const vector<string> TRANSMISSIONS = {"transmission1.txt", "transmission2.txt"};
 
 const vector<string> MCODES = {"mcode1.txt", "mcode2.txt", "mcode3.txt"};
 
-range make_range(size_t l, size_t r) { return std::make_pair(l, r); }
+range make_range(int l, int r) { return std::make_pair(l, r); }
 
-optstring read_contents(const string &path) {
+optstring read_contents(const path &path) {
     std::ifstream fs(path, std::ios::binary);
     if (!fs) {
         std::cerr << "Error: Could not open file: " << path << std::endl;
@@ -42,7 +45,7 @@ void test_transmission(const string &trans, const vector<string> &mcodes) {
     if (lps.second == 0) // empty transmission
         std::cout << "No palindromic substring";
     else
-        std::cout << lps.first << " " << lps.second - 1;
+        std::cout << lps.first + 1 << " " << lps.second;
     std::cout << std::endl;
 }
 
@@ -52,17 +55,16 @@ void compare_transmissions(const string &trans_a, const string &trans_b) {
         std::cout << "No common substring" << std::endl;
         return;
     }
-    std::cout << "[" << lcs.first + 1 << " - " << lcs.second + 1 << "]"
-              << std::endl;
+    std::cout << lcs.first + 1 << " " << lcs.second + 1 << std::endl;
 }
 
 int main(int argc, char *argv[]) {
-    string dir = argc > 1 ? argv[1] : "./";
+    path dir = argc > 1 ? argv[1] : "./";
     optstring contents;
 
     vector<string> mcodes;
     for (auto filename : MCODES) {
-        string path = dir + filename;
+        path path = dir / filename;
         contents = read_contents(path);
         if (!contents)
             return EXIT_FAILURE;
@@ -71,7 +73,7 @@ int main(int argc, char *argv[]) {
 
     vector<string> transmissions;
     for (auto filename : TRANSMISSIONS) {
-        string path = dir + filename;
+        path path = dir / filename;
         contents = read_contents(path);
         if (!contents)
             return EXIT_FAILURE;

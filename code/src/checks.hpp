@@ -8,12 +8,12 @@
 using std::string;
 using std::vector;
 
-typedef std::pair<size_t, size_t> range;
-range make_range(size_t l, size_t r);
+typedef std::pair<int, int> range;
+range make_range(int l, int r);
 
 typedef std::optional<std::string> optstring;
 
-constexpr size_t ASCII_SIZE = 1 << sizeof(char);
+constexpr size_t ASCII_SIZE = 1 << (8 * sizeof(char));
 
 // May be inneficient if this search can be optimized in the case in which
 // checking for many mcodes at the same time is more efficient than looking one

@@ -5,6 +5,7 @@ CXXFLAGS := -Wall -Wextra -std=c++17 -g
 # Directories
 src_dir := src
 build_dir := build
+tests_dir := tests
 
 # Source files and object files
 src := $(shell find $(src_dir) -name '*.cpp')
@@ -20,8 +21,8 @@ all: $(target)
 run: $(target)
 	@./$^
 
-test: $(target)
-	@./test.py --exe $(target)
+test: $(target) | $(tests_dir)
+	@./test.py $(target)
 
 # Link objects into executable
 $(target): $(obj) | $(build_dir)
@@ -34,6 +35,9 @@ $(build_dir)/%.o: $(src_dir)/%.cpp
 
 $(build_dir):
 	@mkdir $@
+
+$(tests_dir):
+	@./gen_tests.sh
 
 # Clean build files
 clean:

@@ -4,12 +4,12 @@
 
 // range on [l r)
 range longest_palindromic_substr(const string &seq) {
-    const int n = static_cast<int>(seq.size());
+    const int n = seq.size();
     if (n == 0)
         return make_range(0, 0);
 
     string t;
-    t.reserve(static_cast<size_t>(2 * n + 3));
+    t.reserve(2 * n + 3);
     t.push_back('^');
     for (char c : seq) {
         t.push_back('#');
@@ -18,8 +18,8 @@ range longest_palindromic_substr(const string &seq) {
     t.push_back('#');
     t.push_back('$');
 
-    const int m = static_cast<int>(t.size());
-    std::vector<int> P(m, 0);
+    const int m = t.size();
+    vector<int> P(m, 0);
     int center = 0, right = 0;
 
     for (int i = 1; i < m - 1; ++i) {

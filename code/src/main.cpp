@@ -4,17 +4,16 @@
 
 #include "checks.hpp"
 
-const vector<const char *> TRANSMISSION = {"transmission1.txt",
-                                           "transmission2.txt"};
+const vector<string> TRANSMISSIONS = {"transmission1.txt", "transmission2.txt"};
 
-const vector<const char *> MCODE = {"mcode1.txt", "mcode2.txt", "mcode3.txt"};
+const vector<string> MCODES = {"mcode1.txt", "mcode2.txt", "mcode3.txt"};
 
 range make_range(size_t l, size_t r) { return std::make_pair(l, r); }
 
-optstring read_contents(const char *filename) {
-    std::ifstream fs(filename, std::ios::binary);
+optstring read_contents(const string &path) {
+    std::ifstream fs(path, std::ios::binary);
     if (!fs) {
-        std::cerr << "Error: Could not open file: " << filename << std::endl;
+        std::cerr << "Error: Could not open file: " << path << std::endl;
         return std::nullopt;
     }
 
@@ -22,8 +21,7 @@ optstring read_contents(const char *filename) {
     buffer << fs.rdbuf();
 
     if (fs.bad()) {
-        std::cerr << "Error: Failed while reading file: " << filename
-                  << std::endl;
+        std::cerr << "Error: Failed while reading file: " << path << std::endl;
         return std::nullopt;
     }
 
@@ -31,42 +29,50 @@ optstring read_contents(const char *filename) {
 }
 
 void test_transmission(const string &trans, const vector<string> &mcodes) {
-    for (auto mc : mcodes) {
-        int substr_start = is_substr(trans, mc);
-        std::cout << (substr_start == -1 ? "false" : "true");
+    for (size_t i = 0; i < mcodes.size(); i++) {
+        int substr_start = is_substr(trans, mcodes[i]);
+        std::cout << "MCODE " << i + 1 << ": "
+                  << (substr_start == -1 ? "false" : "true");
         if (substr_start > -1)
             std::cout << " " << substr_start + 1;
         std::cout << std::endl;
     }
     range lps = longest_palindromic_substr(trans);
-    std::cout << "Longest Palindromic Substring" << std::endl;
-    std::cout << lps.first << " " << lps.second;
+    std::cout << "Longest palindromic substring" << std::endl;
+    if (lps.second == 0) // empty transmission
+        std::cout << "No palindromic substring";
+    else
+        std::cout << lps.first << " " << lps.second - 1;
+    std::cout << std::endl;
 }
 
 void compare_transmissions(const string &trans_a, const string &trans_b) {
     range lcs = longest_common_substr(trans_a, trans_b);
     if (lcs.second - lcs.first <= 0) {
-        std::cout << "No common sub string" << std::endl;
+        std::cout << "No common substring" << std::endl;
         return;
     }
     std::cout << "[" << lcs.first + 1 << " - " << lcs.second + 1 << "]"
               << std::endl;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
+    string dir = argc > 1 ? argv[1] : "./";
     optstring contents;
 
-    vector<string> mcodes(MCODE.size());
-    for (auto filename : MCODE) {
-        contents = read_contents(filename);
+    vector<string> mcodes;
+    for (auto filename : MCODES) {
+        string path = dir + filename;
+        contents = read_contents(path);
         if (!contents)
             return EXIT_FAILURE;
         mcodes.push_back(*contents);
     }
 
-    vector<string> transmissions(MCODE.size());
-    for (auto filename : MCODE) {
-        contents = read_contents(filename);
+    vector<string> transmissions;
+    for (auto filename : TRANSMISSIONS) {
+        string path = dir + filename;
+        contents = read_contents(path);
         if (!contents)
             return EXIT_FAILURE;
         transmissions.push_back(*contents);

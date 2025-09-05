@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <vector>
 
+// range on [l r)
 range longest_palindromic_substr(const string &seq) {
     const int n = static_cast<int>(seq.size());
     if (n == 0)

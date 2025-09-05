@@ -20,6 +20,9 @@ all: $(target)
 run: $(target)
 	@./$^
 
+test: $(target)
+	@./test.py --exe $(target)
+
 # Link objects into executable
 $(target): $(obj) | $(build_dir)
 	$(CXX) $(CXXFLAGS) -o $@ $^

@@ -38,7 +38,11 @@ void test_transmission(const string &trans, const vector<string> &mcodes) {
             std::cout << " " << substr_start + 1;
         std::cout << std::endl;
     }
+    range lps = longest_palindromic_substr(trans);
+    std::cout << "Longest Palindromic Substring" << std::endl;
+    std::cout << lps.first << " " << lps.second;
 }
+
 void compare_transmissions(const string &trans_a, const string &trans_b) {
     range lcs = longest_common_substr(trans_a, trans_b);
     if (lcs.second - lcs.first <= 0) {
@@ -78,21 +82,4 @@ int main() {
         }
     }
     return 0;
-}
-
-int is_substr(const string &seq, const string &sub) {
-    (void)seq;
-    (void)sub;
-    return 0;
-}
-
-range longest_palindrome_substr(const string &seq) {
-    (void)seq;
-    return make_range(0, 0);
-}
-
-range longest_common_substr(const string &seq_a, const string &seq_b) {
-    (void)seq_a;
-    (void)seq_b;
-    return make_range(0, 0);
 }

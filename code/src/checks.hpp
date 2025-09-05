@@ -21,7 +21,7 @@ constexpr size_t ASCII_SIZE = 1 << sizeof(char);
 // O(m).
 int is_substr(const string &seq, const string &sub);
 
-range longest_palindrome_substr(const string &seq);
+range longest_palindromic_substr(const string &seq);
 
 range longest_common_substr(const string &seq_a, const string &seq_b);
 

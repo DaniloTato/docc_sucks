@@ -1,6 +1,5 @@
 #include "checks.hpp"
 #include <algorithm>
-#include <vector>
 
 // range on [l r)
 range longest_palindromic_substr(const string &seq) {

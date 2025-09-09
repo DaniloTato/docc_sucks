@@ -64,7 +64,7 @@ void compare_transmissions(const string &trans_a, const string &trans_b) {
         std::cout << "No common substring" << std::endl;
         return;
     }
-    std::cout << lcs.first + 1 << " " << lcs.second + 1 << std::endl;
+    std::cout << lcs.first + 1 << " " << lcs.second << std::endl;
 }
 
 int main(int argc, char *argv[]) {

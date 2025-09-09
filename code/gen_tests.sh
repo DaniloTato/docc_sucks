@@ -127,7 +127,7 @@ Longest palindromic substring
 Comparison between transmissions 1 and 2
 1 6
 Test transmission 2
-MCODE 1: true 5
+MCODE 1: true 6
 MCODE 2: false
 MCODE 3: false
 Longest palindromic substring

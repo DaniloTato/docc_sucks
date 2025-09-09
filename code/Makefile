@@ -11,24 +11,26 @@ tests_dir := tests
 src := $(shell find $(src_dir) -name '*.cpp')
 obj := $(src:$(src_dir)/%.cpp=$(build_dir)/%.o)
 
-# Target executable
+gen_tests := gen_tests.sh
+
 target := $(build_dir)/main
 
-# Default rule
 all: $(target)
 
-# Run the program
 run: $(target)
 	@./$^
+
+debug: $(target)
+	@gdb ./$^
 
 test: $(target) | $(tests_dir)
 	@./test.py $(target)
 
-# Link objects into executable
+.PHONY: all run test debug clean
+
 $(target): $(obj) | $(build_dir)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
-# Compile .cpp into .o in the build directory (mirrors source tree)
 $(build_dir)/%.o: $(src_dir)/%.cpp
 	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
@@ -36,11 +38,10 @@ $(build_dir)/%.o: $(src_dir)/%.cpp
 $(build_dir):
 	@mkdir $@
 
-$(tests_dir):
-	@./gen_tests.sh
+$(tests_dir): $(gen_tests)
+	@./$^
 
-# Clean build files
 clean:
 	@rm -rf $(build_dir)
 
-.PHONY: all run test debug clean
+.PHONY: clean

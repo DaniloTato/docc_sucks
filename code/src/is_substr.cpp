@@ -15,7 +15,7 @@ int is_substr(const string &seq, const string &sub) {
     }
 
     int s = 0;
-    while (s + n < m) {
+    while (s + n <= m) {
         int j = n - 1;
 
         while (j >= 0 && sub[j] == seq[s + j])

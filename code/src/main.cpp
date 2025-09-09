@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -28,7 +29,15 @@ optstring read_contents(const path &path) {
         return std::nullopt;
     }
 
-    return buffer.str();
+    std::string content = buffer.str();
+
+    content.erase(std::remove_if(content.begin(), content.end(),
+                                 [](unsigned char c) {
+                                     return std::iscntrl(c) && c != ' ';
+                                 }),
+                  content.end());
+
+    return content;
 }
 
 void test_transmission(const string &trans, const vector<string> &mcodes) {

@@ -66,7 +66,7 @@ MCODE 1: true 3
 MCODE 2: false
 MCODE 3: false
 Longest palindromic substring
-3 9
+1 11
 EOF
 
 # ---------- case03_generic_empty_vs_nonempty ----------

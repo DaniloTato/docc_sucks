@@ -68,8 +68,9 @@ void compare_transmissions(const string &trans_a, const string &trans_b) {
     std::cout << lcs.first + 1 << " " << lcs.second << std::endl;
 }
 
-int main(int argc, char *argv[]) {
-    path dir = argc > 1 ? argv[1] : "./";
+int main() {
+    // run program from /DOCC_SUCKS/code
+    path dir = "tests/case01_generic_pal_and_match";
     optstring contents;
 
     vector<string> mcodes;

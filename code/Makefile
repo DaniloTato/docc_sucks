@@ -14,11 +14,12 @@ obj := $(src:$(src_dir)/%.cpp=$(build_dir)/%.o)
 gen_tests := gen_tests.sh
 
 target := $(build_dir)/main
+args ?=
 
 all: $(target)
 
 run: $(target)
-	@./$^
+	@./$^ $(args)
 
 debug: $(target)
 	@gdb ./$^

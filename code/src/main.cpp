@@ -43,7 +43,6 @@ optstring read_contents(const path &path) {
 void test_transmission(const string &trans, const vector<string> &mcodes) {
     for (size_t i = 0; i < mcodes.size(); i++) {
         int substr_start = is_substr(trans, mcodes[i]);
-        // std::cout << "substrstart: " << substr_start << "\n";
         std::cout << "MCODE " << i + 1 << ": "
                   << (substr_start == -1 ? "false" : "true");
         if (substr_start > -1)

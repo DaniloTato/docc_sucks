@@ -4,11 +4,9 @@ This is the file structure of the project:
 
 ```bash
 .
-├── src
-│  ├── checks.hpp
-│  ├── is_substr.cpp
-│  ├── longest_common_substring.cpp
-│  ├── longest_palindrome_substr.cpp
+├──├── src
+│  ├── knapsack.cpp
+│  ├── knapsack.hpp
 │  └── main.cpp
 ├── .gitignore
 ├── gen_tests.sh

@@ -7,16 +7,22 @@ import difflib
 
 
 def run_case(bin_path: Path, case_dir: Path) -> bool:
-    case_arg = str(case_dir.resolve()) + "/"
+    input_file = case_dir / "input.txt"
+
+    if not input_file.exists():
+        print(f"[ERROR] Input file not found: {input_file}")
+        return False
 
     try:
-        result = subprocess.run(
-            [str(bin_path), case_arg],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            check=False,
-        )
+        with open(input_file, "r") as infile:
+            result = subprocess.run(
+                [str(bin_path)],
+                stdin=infile,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                check=False,
+            )
     except FileNotFoundError:
         print(f"[ERROR] Binary not found: {bin_path}")
         return False

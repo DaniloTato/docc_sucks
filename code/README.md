@@ -1,72 +1,89 @@
-# README
+# README.md
 
-This is the file structure of the project:
+# Traveling Salesman Problem (TSP) Project
 
-```bash
-.
-├── src
-│  ├── checks.hpp
-│  ├── is_substr.cpp
-│  ├── longest_common_substring.cpp
-│  ├── longest_palindrome_substr.cpp
-│  └── main.cpp
-├── .gitignore
-├── gen_tests.sh
-├── Makefile
-├── README.md
-└── test.py
-build/main
+This project contains a C++ implementation of three TSP algorithms (Nearest Neighbor, Cheapest Link, and MST-based) and a Python script to run experiments and generate performance tables.
+
+## Project Structure
+```
+project_root/
+├── src/
+│   ├── main.cpp          # Main program for TSP
+│   ├── tsp_algorithms.cpp # Algorithm implementations
+│   └── tsp_io.cpp         # Input/Output helpers
+├── include/
+│   ├── tsp_algorithms.hpp
+│   └── tsp_io.hpp
+├── tests/
+│   └── dsj1000.tsp       # Example TSP dataset
+├── build/                # Build output directory
+├── table.py              # Python script for experiments
+├── Makefile              # Build automation
+└── README.md             # This file
 ```
 
-The code can be compiled via:
+## C++ Compilation
 
+### Manual Compilation
+Assuming you have `g++` installed:
 ```bash
-$ make # outputs binary to build/main
+# Compile source files
+g++ -std=c++17 -O2 -Iinclude -c src/tsp_algorithms.cpp -o tsp_algorithms.o
+g++ -std=c++17 -O2 -Iinclude -c src/tsp_io.cpp -o tsp_io.o
+g++ -std=c++17 -O2 -Iinclude -c src/main.cpp -o main.o
+
+# Link objects
+g++ -std=c++17 -O2 -o build/tsp main.o tsp_algorithms.o tsp_io.o
 ```
 
-The program reads this files on it's execution:
-
+### Using Makefile
 ```bash
-transmission1.txt
-transmission2.txt
-mcode1.txt
-mcode2.txt
-mcode3.txt
+# Compile and link
+make
+
+# Run with sample input
+make run ARGS="500 < tests/dsj1000.tsp"
 ```
 
-The program recieves a path to a directory as it's first argument, if none is
-provided, the program defaults it to the current working dir.
+- `make` will compile the program and produce `build/tsp`
+- `make run` will execute the program using the redirected input from `dsj1000.tsp`
 
+### Usage
 ```bash
-$ make run args="dir"
-# optionally via:
-# $ ./build/main <dir>
+./build/tsp <ALGO: NN|CL|MST> <N> < <dataset.tsp>
+```
+- `ALGO`: Choose the algorithm (`NN`, `CL`, `MST`)
+- `N`: Number of cities to sample
+- Input is redirected from a `.tsp` file
+
+Example:
+```bash
+./build/tsp NN 100 < tests/dsj1000.tsp
 ```
 
-We also include the `gen_tests.sh` and `test.py` scripts, which correspondingly
-configure the following test suite, and execute the test suite:
+## Python Experiment Script
+`table.py` runs the compiled TSP program for different `N` values, computes cost and time statistics, and outputs a table with mean and standard deviation.
 
+### Setup
+1. Create a virtual environment:
 ```bash
-tests
-├── case01_generic_pal_and_match
-├── case02_generic_common_block
-├── case03_generic_empty_vs_nonempty
-├── edge01_even_vs_odd_pal
-├── edge02_no_common_substr
-└── edge03_multi_hits_overlap
+python3 -m venv venv
+source venv/bin/activate
+```
+2. Install dependencies:
+```bash
+pip install pandas
 ```
 
-Each directory contains the specified files, plus an `expected.txt`. To run every the entire
-tests suite automatically, simply execute:
-
+### Usage
 ```bash
-$ make test
-[PASS] case01_generic_pal_and_match
-[PASS] case02_generic_common_block
-[PASS] case03_generic_empty_vs_nonempty
-[PASS] edge01_even_vs_odd_pal
-[PASS] edge02_no_common_substr
-[PASS] edge03_multi_hits_overlap
-
-=== All Passed ===
+python table.py
 ```
+- Make sure `build/tsp` is compiled before running.
+- The script reads `dsj1000.tsp` and runs experiments for multiple `N` values.
+- Generates a table showing `COST` and `TIME_us` (mean and std) for each algorithm.
+
+## Notes
+- The C++ program uses a random seed based on system time, ensuring reproducibility within a single run for all algorithms.
+- Adjust `N` values and number of repetitions directly in `table.py` if desired.
+

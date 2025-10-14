@@ -1,102 +1,66 @@
-#include <algorithm>
-#include <filesystem>
-#include <fstream>
+#include "tsp_io.hpp"
+#include "tsp_algorithms.hpp"
+#include <chrono>
+#include <random>
 #include <iostream>
-#include <sstream>
+#include <vector>
+#include <string>
 
-using std::filesystem::path;
-
-#include "checks.hpp"
-
-const vector<string> TRANSMISSIONS = {"transmission1.txt", "transmission2.txt"};
-
-const vector<string> MCODES = {"mcode1.txt", "mcode2.txt", "mcode3.txt"};
-
-range make_range(int l, int r) { return std::make_pair(l, r); }
-
-optstring read_contents(const path &path) {
-    std::ifstream fs(path, std::ios::binary);
-    if (!fs) {
-        std::cerr << "Error: Could not open file: " << path << std::endl;
-        return std::nullopt;
+int main(int argc, char** argv) {
+    if (argc < 2) {
+        std::cerr << "Usage: " << argv[0] << " <N> < <input_file>\n";
+        return 1;
     }
 
-    std::ostringstream buffer;
-    buffer << fs.rdbuf();
+    int N = std::stoi(argv[1]);
+    unsigned seed = static_cast<unsigned>(
+        std::chrono::system_clock::now().time_since_epoch().count()
+    );
 
-    if (fs.bad()) {
-        std::cerr << "Error: Failed while reading file: " << path << std::endl;
-        return std::nullopt;
+    auto pts_all = read_tsp_from_stdin();
+    if (pts_all.empty()) {
+        std::cerr << "No points read from stdin.\n";
+        return 1;
     }
 
-    std::string content = buffer.str();
-
-    content.erase(std::remove_if(content.begin(), content.end(),
-                                 [](unsigned char c) {
-                                     return std::iscntrl(c) && c != ' ';
-                                 }),
-                  content.end());
-
-    return content;
-}
-
-void test_transmission(const string &trans, const vector<string> &mcodes) {
-    for (size_t i = 0; i < mcodes.size(); i++) {
-        int substr_start = is_substr(trans, mcodes[i]);
-        std::cout << "MCODE " << i + 1 << ": "
-                  << (substr_start == -1 ? "false" : "true");
-        if (substr_start > -1)
-            std::cout << " " << substr_start + 1;
-        std::cout << std::endl;
-    }
-    range lps = longest_palindromic_substr(trans);
-    std::cout << "Longest palindromic substring" << std::endl;
-    if (lps.second == 0) // empty transmission
-        std::cout << "No palindromic substring";
-    else
-        std::cout << lps.first + 1 << " " << lps.second;
-    std::cout << std::endl;
-}
-
-void compare_transmissions(const string &trans_a, const string &trans_b) {
-    range lcs = longest_common_substr(trans_a, trans_b);
-    if (lcs.second - lcs.first <= 0) {
-        std::cout << "No common substring" << std::endl;
-        return;
-    }
-    std::cout << lcs.first + 1 << " " << lcs.second << std::endl;
-}
-
-int main(int argc, char *argv[]) {
-    path dir = argc > 1 ? argv[1] : "./";
-    optstring contents;
-
-    vector<string> mcodes;
-    for (auto filename : MCODES) {
-        path path = dir / filename;
-        contents = read_contents(path);
-        if (!contents)
-            return EXIT_FAILURE;
-        mcodes.push_back(*contents);
+    // Sample indices once
+    auto idx = sample_indices(pts_all.size(), N, seed);
+    std::vector<Point> pts;
+    pts.reserve(N);
+    for (int i = 0; i < N; i++) {
+        Point p = pts_all[idx[i]];
+        p.id = i;
+        pts.push_back(p);
     }
 
-    vector<string> transmissions;
-    for (auto filename : TRANSMISSIONS) {
-        path path = dir / filename;
-        contents = read_contents(path);
-        if (!contents)
-            return EXIT_FAILURE;
-        transmissions.push_back(*contents);
-    }
+    auto d = compute_dist_matrix(pts);
 
-    for (size_t i = 0; i < transmissions.size(); i++) {
-        std::cout << "Test transmission " << i + 1 << std::endl;
-        test_transmission(transmissions[i], mcodes);
-        if (i + 1 < transmissions.size()) {
-            std::cout << "Comparison between transmissions " << i + 1 << " and "
-                      << i + 2 << std::endl;
-            compare_transmissions(transmissions[i], transmissions[i + 1]);
+    std::vector<std::string> algos = {"NN","CL","MST"};
+    for (auto &algo : algos) {
+        auto start = std::chrono::high_resolution_clock::now();
+
+        std::pair<long long, std::vector<int>> result;
+        if (algo == "NN") {
+            std::mt19937 rng(seed);
+            int start_idx = rng() % N;
+            result = nearest_neighbor(d, start_idx);
+        } else if (algo == "CL") {
+            result = cheapest_link(d);
+        } else if (algo == "MST") {
+            result = mst_tsp(d);
         }
+
+        auto end = std::chrono::high_resolution_clock::now();
+        long long elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+
+        std::cout << "ALGO=" << algo
+                  << " N=" << N
+                  << " SEED=" << seed
+                  << " COST=" << result.first
+                  << " TIME_in_micro_s=" << elapsed
+                  << " TOUR_LEN=" << (int)result.second.size() - 1
+                  << "\n";
     }
+
     return 0;
 }

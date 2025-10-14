@@ -1,5 +1,7 @@
 /build/
 
+.clangd
+
 /**/*.txt
 
 # Prerequisites

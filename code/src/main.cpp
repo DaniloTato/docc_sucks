@@ -1,102 +1,132 @@
-#include <algorithm>
-#include <filesystem>
+/*
+ * Compute the Max-Flow using the Ford-Fulkerson algorithm using BFS, with time
+ * complexity of O(V(E^2)) for V vertices and E edges
+ * */
+
 #include <fstream>
 #include <iostream>
+#include <limits>
+#include <queue>
 #include <sstream>
+#include <string>
+#include <vector>
 
-using std::filesystem::path;
+using namespace std;
+typedef long long lli;
 
-#include "checks.hpp"
+struct Edge {
+    int to, rev;
+    lli cap;
+    Edge(int t, int r, lli c) : to(t), rev(r), cap(c) {}
+};
 
-const vector<string> TRANSMISSIONS = {"transmission1.txt", "transmission2.txt"};
-
-const vector<string> MCODES = {"mcode1.txt", "mcode2.txt", "mcode3.txt"};
-
-range make_range(int l, int r) { return std::make_pair(l, r); }
-
-optstring read_contents(const path &path) {
-    std::ifstream fs(path, std::ios::binary);
-    if (!fs) {
-        std::cerr << "Error: Could not open file: " << path << std::endl;
-        return std::nullopt;
+struct Graph {
+    int n;
+    vector<vector<Edge>> g;
+    Graph(int n_) : n(n_), g(n_) {}
+    void add_edge(int u, int v, lli c) {
+        g[u].emplace_back(v, (int)g[v].size(), c);
+        g[v].emplace_back(u, (int)g[u].size() - 1, 0);
     }
-
-    std::ostringstream buffer;
-    buffer << fs.rdbuf();
-
-    if (fs.bad()) {
-        std::cerr << "Error: Failed while reading file: " << path << std::endl;
-        return std::nullopt;
+    lli maxflow(int s, int t) {
+        lli flow = 0;
+        vector<int> pv(n), pe(n);
+        while (true) {
+            fill(pv.begin(), pv.end(), -1);
+            queue<int> q;
+            q.push(s);
+            pv[s] = s;
+            while (!q.empty() && pv[t] == -1) {
+                int u = q.front();
+                q.pop();
+                for (int i = 0; i < (int)g[u].size(); ++i) {
+                    Edge &e = g[u][i];
+                    if (pv[e.to] == -1 && e.cap > 0) {
+                        pv[e.to] = u;
+                        pe[e.to] = i;
+                        q.push(e.to);
+                        if (e.to == t)
+                            break;
+                    }
+                }
+            }
+            if (pv[t] == -1)
+                break;
+            lli aug = numeric_limits<lli>::max();
+            for (int v = t; v != s; v = pv[v]) {
+                int u = pv[v];
+                Edge &e = g[u][pe[v]];
+                if (e.cap < aug)
+                    aug = e.cap;
+            }
+            for (int v = t; v != s; v = pv[v]) {
+                int u = pv[v];
+                int ei = pe[v];
+                Edge &e = g[u][ei];
+                e.cap -= aug;
+                g[v][e.rev].cap += aug;
+            }
+            flow += aug;
+        }
+        return flow;
     }
+};
 
-    std::string content = buffer.str();
-
-    content.erase(std::remove_if(content.begin(), content.end(),
-                                 [](unsigned char c) {
-                                     return std::iscntrl(c) && c != ' ';
-                                 }),
-                  content.end());
-
-    return content;
+bool skip(const string &line) {
+    for (char ch : line) {
+        if (isspace((unsigned char)ch))
+            continue;
+        return ch == 'c' || ch == '\0';
+    }
+    return true;
 }
 
-void test_transmission(const string &trans, const vector<string> &mcodes) {
-    for (size_t i = 0; i < mcodes.size(); i++) {
-        int substr_start = is_substr(trans, mcodes[i]);
-        std::cout << "MCODE " << i + 1 << ": "
-                  << (substr_start == -1 ? "false" : "true");
-        if (substr_start > -1)
-            std::cout << " " << substr_start + 1;
-        std::cout << std::endl;
+int main(int argc, char **argv) {
+    if (argc < 2) {
+        cerr << "Missing dimacs file." << endl;
+        return 1;
     }
-    range lps = longest_palindromic_substr(trans);
-    std::cout << "Longest palindromic substring" << std::endl;
-    if (lps.second == 0) // empty transmission
-        std::cout << "No palindromic substring";
-    else
-        std::cout << lps.first + 1 << " " << lps.second;
-    std::cout << std::endl;
-}
+    ifstream fin(argv[1]);
+    if (!fin)
+        return 1;
 
-void compare_transmissions(const string &trans_a, const string &trans_b) {
-    range lcs = longest_common_substr(trans_a, trans_b);
-    if (lcs.second - lcs.first <= 0) {
-        std::cout << "No common substring" << std::endl;
-        return;
-    }
-    std::cout << lcs.first + 1 << " " << lcs.second << std::endl;
-}
+    int N = -1, M = -1, s = -1, t = -1;
+    vector<tuple<int, int, lli>> edges;
+    string line;
 
-int main(int argc, char *argv[]) {
-    path dir = argc > 1 ? argv[1] : "./";
-    optstring contents;
-
-    vector<string> mcodes;
-    for (auto filename : MCODES) {
-        path path = dir / filename;
-        contents = read_contents(path);
-        if (!contents)
-            return EXIT_FAILURE;
-        mcodes.push_back(*contents);
-    }
-
-    vector<string> transmissions;
-    for (auto filename : TRANSMISSIONS) {
-        path path = dir / filename;
-        contents = read_contents(path);
-        if (!contents)
-            return EXIT_FAILURE;
-        transmissions.push_back(*contents);
-    }
-
-    for (size_t i = 0; i < transmissions.size(); i++) {
-        std::cout << "Test transmission " << i + 1 << std::endl;
-        test_transmission(transmissions[i], mcodes);
-        if (i + 1 < transmissions.size()) {
-            std::cout << "Comparison between transmissions " << i + 1 << " and "
-                      << i + 2 << std::endl;
-            compare_transmissions(transmissions[i], transmissions[i + 1]);
+    while (getline(fin, line)) {
+        if (skip(line))
+            continue;
+        istringstream iss(line);
+        string tag;
+        if (!(iss >> tag))
+            continue;
+        if (tag == "p") {
+            string kind;
+            iss >> kind >> N >> M;
+        } else if (tag == "n") {
+            int id;
+            string which;
+            iss >> id >> which;
+            if (which == "s")
+                s = id;
+            else if (which == "t")
+                t = id;
+        } else if (tag == "a") {
+            int u, v;
+            lli c;
+            iss >> u >> v >> c;
+            edges.emplace_back(u, v, c);
         }
     }
+
+    Graph G(N);
+    for (auto &e : edges) {
+        int u, v;
+        lli c;
+        tie(u, v, c) = e;
+        G.add_edge(u - 1, v - 1, c);
+    }
+    cout << G.maxflow(s - 1, t - 1) << endl;
     return 0;
 }

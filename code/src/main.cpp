@@ -26,9 +26,6 @@ struct Input {
 int main() {
     Input input(std::cin);
 
-    // -------------------------------------------------------------
-    // PART 1: MST – Fiber wiring plan
-    // -------------------------------------------------------------
     std::cout << "END_OF_INPUT\n\n============================================================\n";
     std::cout << "1. Fiber Wiring Plan (Minimum Spanning Tree)\n";
     std::cout << "   List of arcs of the form (A, B):\n";
@@ -41,9 +38,6 @@ int main() {
     }
     std::cout << "\n";
 
-    // -------------------------------------------------------------
-    // PART 2: TSP Route for Mail Delivery
-    // -------------------------------------------------------------
     std::cout << "============================================================\n";
     std::cout << "2. Mail Delivery Route (TSP Approximation)\n";
     std::cout << "   Start and end in the same neighborhood:\n";
@@ -54,9 +48,6 @@ int main() {
         std::cout << n << " ";
     std::cout << "\n\n";
 
-    // -------------------------------------------------------------
-    // PART 3: Maximum Information Flow
-    // -------------------------------------------------------------
     std::cout << "============================================================\n";
     std::cout << "3. Maximum Information Flow\n";
     std::cout << "   Value from the initial node to the final node:\n";
@@ -65,9 +56,6 @@ int main() {
     weight_t maxflow_result = maxflow(input.flow_graph);
     std::cout << maxflow_result << "\n\n";
 
-    // -------------------------------------------------------------
-    // PART 4: Voronoi Cells – Neighborhood Influence Zones
-    // -------------------------------------------------------------
     std::cout << "============================================================\n";
     std::cout << "4. Voronoi Polygons for Exchange Centers\n";
     std::cout << "   Each polygon is a list of (x, y) points:\n";

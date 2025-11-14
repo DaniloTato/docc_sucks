@@ -27,23 +27,23 @@ struct Input {
 int main() {
     Input input(std::cin);
 
-    /*part 1*/
+    std::cout << "part 1:\n\n";
     vector<edge_t> mst_result = mst(input.dist_graph);
     for (edge_t e : mst_result)
         input.dist_graph.print_edge(std::cout, e);
     std::cout << "\n";
 
-    /*part 2*/
+    std::cout << "part 2:\n\n";
     vector<node_t> tsp_result = tsp(input.dist_graph);
     for (node_t n : tsp_result)
         std::cout << n << " ";
     std::cout << "\n\n";
 
-    /*part 3*/
+    std::cout << "part 3:\n\n";
     weight_t maxflow_result = maxflow(input.flow_graph);
     std::cout << maxflow_result << "\n\n";
 
-    /*part 4*/
+    std::cout << "part 4:\n\n";
     vector<vector<Point>> voroni_cells_result = voroni_cells(input.exchanges);
     for (auto cell : voroni_cells_result) {
         for (Point p : cell)

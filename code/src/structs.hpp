@@ -29,7 +29,7 @@ struct Point {
     Point();
     Point(std::istream &in);
 
-    void print(std::ostream &out);
+    void print(std::ostream &out) const;
 };
 
 template <typename T> void print_pair(std::ostream &out, T a, T b);

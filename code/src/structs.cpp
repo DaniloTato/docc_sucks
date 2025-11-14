@@ -21,7 +21,7 @@ Point::Point(std::istream &in) {
     in >> discard >> real >> discard >> imag >> discard;
     val = {real, imag};
 }
-void Point::print(std::ostream &out) {
+void Point::print(std::ostream &out) const {
     print_pair(out, val.real(), val.imag());
 }
 

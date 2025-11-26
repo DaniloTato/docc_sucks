@@ -6,7 +6,7 @@
 #include <vector>
 
 // choose globally how big random tests are
-static const int GLOBAL_N = 20;
+static const int GLOBAL_N = 50;
 
 int main() {
     TSP_SUBSET_SIZE = GLOBAL_N;
